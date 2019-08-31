@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -71,11 +71,11 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="rof-Dp-iZ0" firstAttribute="bottom" secondItem="gk5-VW-tID" secondAttribute="bottom" id="1ce-Wf-F56"/>
+                            <constraint firstAttribute="bottom" secondItem="gk5-VW-tID" secondAttribute="bottom" id="1ce-Wf-F56"/>
                             <constraint firstItem="TeX-zS-r7r" firstAttribute="trailing" secondItem="rof-Dp-iZ0" secondAttribute="trailing" id="2D4-7Q-jL5"/>
                             <constraint firstItem="gk5-VW-tID" firstAttribute="top" secondItem="rof-Dp-iZ0" secondAttribute="top" id="Cbp-Qy-dGh"/>
                             <constraint firstItem="TeX-zS-r7r" firstAttribute="leading" secondItem="rof-Dp-iZ0" secondAttribute="leading" id="S2e-xl-rEK"/>
-                            <constraint firstItem="rof-Dp-iZ0" firstAttribute="bottom" secondItem="TeX-zS-r7r" secondAttribute="bottom" id="bgN-Z7-WHG"/>
+                            <constraint firstAttribute="bottom" secondItem="TeX-zS-r7r" secondAttribute="bottom" id="bgN-Z7-WHG"/>
                             <constraint firstAttribute="trailing" secondItem="gk5-VW-tID" secondAttribute="trailing" id="heY-a4-4tp"/>
                             <constraint firstItem="TeX-zS-r7r" firstAttribute="top" secondItem="rof-Dp-iZ0" secondAttribute="top" id="k0g-8E-m1S"/>
                             <constraint firstItem="gk5-VW-tID" firstAttribute="leading" secondItem="rof-Dp-iZ0" secondAttribute="leading" id="rY5-Uh-Ezc"/>

@@ -6,40 +6,46 @@ struct APIClientConstants {
 	static let timeout: TimeInterval = 10
 }
 
+enum APIError: Error {
+    case error(String)
+    case serialization
+    case unauthorized
+    case serverError
+    case timeout
+}
+
 enum HTTPMethod: String {
-	
-	case get = "GET"
+    case get = "GET"
 	case post = "POST"
 	case put = "PUT"
 	case delete = "DELETE"
 }
 
 protocol ResourceType {
+    associatedtype ResponseType: Codable
 	var url: URL { get set }
 	var parameters: [String: String]? { get set }
-	var body: [String: Any]? { get set }
-	var headers: [String: String]? { get set }
+    var method: HTTPMethod { get }
 	
-	init(url: URL, parameters: [String: String]?, body: [String: Any]?, headers: [String: String]?)
+	init(url: URL, parameters: [String: String]?, method: HTTPMethod)
 }
 
-struct Resource: ResourceType {
-	public var url: URL
+struct Resource<T: Codable>: ResourceType {
+    typealias ResponseType = T
+    public var url: URL
 	public var parameters: [String: String]?
-	public var body: [String: Any]?
-	public var headers: [String: String]?
+    public var method: HTTPMethod
 	
-	public init(url: URL, parameters: [String: String]? = nil, body: [String: Any]? = nil, headers: [String: String]? = nil) {
+    public init(url: URL, parameters: [String: String]? = nil, method: HTTPMethod) {
 		self.url = url
 		self.parameters = parameters
-		self.body = body
-		self.headers = headers
+        self.method = method
 	}
 }
 
-class APIClient<T: JSONDecodable>: APIClientType {
+class APIClient {
 	
-	let configuration: URLSessionConfiguration
+	private let configuration: URLSessionConfiguration
 	
 	init(configuration: URLSessionConfiguration = .default) {
 		self.configuration = configuration
@@ -47,34 +53,25 @@ class APIClient<T: JSONDecodable>: APIClientType {
 		self.configuration.urlCache = nil
 	}
 	
-	func getItem(forResource resource: ResourceType) -> Observable<T> {
-		return request(forResource: resource, method: .get)
-			.flatMap { decode($0) }
-	}
+    func execute<R: ResourceType>(_ resource: R) -> Observable<R.ResponseType> {
+        return request(resource)
+            .flatMap { data -> Observable<R.ResponseType> in
+                if let data = data {
+                    do {
+                        let value = try JSONDecoder().decode(R.ResponseType.self, from: data)
+                        return Observable.of(value)
+                    } catch {
+                        return Observable<R.ResponseType>.error(APIError.serialization)
+                    }
+                } else {
+                    return Observable<R.ResponseType>.error(APIError.serialization)
+                }
+        }
+    }
+    
+    // MARK: - Request
 	
-	func getItems(forResource resource: ResourceType) -> Observable<[T]> {
-		return request(forResource: resource, method: .get)
-			.flatMap { decode($0) }
-	}
-	
-	func postItem(forResource resource: ResourceType) -> Observable<T> {
-		return request(forResource: resource, method: .post)
-			.flatMap { decode($0) }
-	}
-	
-	func updateItem(forResource resource: ResourceType) -> Observable<T> {
-		return request(forResource: resource, method: .put)
-			.flatMap { decode($0) }
-	}
-	
-	func deleteItem(forResource resource: ResourceType) -> Observable<T> {
-		return request(forResource: resource, method: .delete)
-			.flatMap { decode($0) }
-	}
-	
-	// MARK: - Request
-	
-	private func request(forResource resource: ResourceType, method: HTTPMethod) -> Observable<Data> {
+	private func request<R: ResourceType>(_ resource: R) -> Observable<Data?> {
 		
 		var url = resource.url
 		if let parametersJSON = resource.parameters {
@@ -86,15 +83,8 @@ class APIClient<T: JSONDecodable>: APIClientType {
 		}
 		
 		var request = URLRequest(url: url)
-		request.httpMethod = method.rawValue
+		request.httpMethod = resource.method.rawValue
 		
-		if let bodyJSON = resource.body {
-			do {
-				request.httpBody = try JSONSerialization.data(withJSONObject: bodyJSON, options: [.prettyPrinted])
-			} catch {
-				return Observable.error(APIError.serialization)
-			}
-		}
 		request.addValue("application/json", forHTTPHeaderField: "Accept")
 		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 		
@@ -129,8 +119,8 @@ class APIClient<T: JSONDecodable>: APIClientType {
 			}
 			.retry(APIClientConstants.retries)
 			.catchError { error in
-				return Observable<Data>.error(APIError.error(error.localizedDescription))
+				return Observable<Data?>.error(APIError.error(error.localizedDescription))
 			}
-			.timeout(APIClientConstants.timeout, other: Observable<Data>.error(APIError.timeout), scheduler: MainScheduler.instance)
+			.timeout(APIClientConstants.timeout, other: Observable<Data?>.error(APIError.timeout), scheduler: MainScheduler.instance)
 	}
 }

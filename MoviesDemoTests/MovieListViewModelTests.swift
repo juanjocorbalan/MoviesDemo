@@ -2,7 +2,7 @@ import XCTest
 import RxSwift
 @testable import MoviesDemo
 
-class MoviesLisrViewModelTests: XCTestCase {
+class MoviesListViewModelTests: XCTestCase {
 	
 	private var disposeBag = DisposeBag()
 
@@ -22,7 +22,7 @@ class MoviesLisrViewModelTests: XCTestCase {
     
     func testViewModelProvidesTitleObservable() {
 
-		let expectation = XCTestExpectation(description: "MoviesLisrViewModelTests should provide movies array  observable")
+		let expectation = XCTestExpectation(description: "MoviesLisrViewModelTests should provide movies array observable")
 		
 		sut.title
 			.subscribe(onNext: { title in
@@ -38,7 +38,7 @@ class MoviesLisrViewModelTests: XCTestCase {
 
 	func testViewModelProvidesMoviesArrayObservable() {
 		
-		let expectation = XCTestExpectation(description: "MoviesLisrViewModelTests should provide movies array  observable")
+		let expectation = XCTestExpectation(description: "MoviesLisrViewModelTests should provide movies array observable")
 
 		sut.movies
 			.skip(1) // skip first event (cache response): there aren't any cached movies at point

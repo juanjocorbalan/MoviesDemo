@@ -1,7 +1,7 @@
 import Foundation
 import RxSwift
 
-protocol MoviesCacheRepositoryType {
+protocol MoviesCacheDataSourceType {
 	func getAll() -> Observable<[Movie]>
 	func deleteAll() -> Observable<Void>
 	func get(by id: String) -> Observable<Movie>
@@ -10,7 +10,7 @@ protocol MoviesCacheRepositoryType {
 	func createOrUpdate(movie: Movie) -> Observable<Void>
 }
 
-class MoviesCacheRepository<CacheClient>: MoviesCacheRepositoryType where CacheClient: CacheClientType, CacheClient.T == Movie {
+class MoviesCacheDataSource<CacheClient>: MoviesCacheDataSourceType where CacheClient: CacheClientType, CacheClient.T == Movie {
 	
 	private let cacheClient: CacheClient
 	

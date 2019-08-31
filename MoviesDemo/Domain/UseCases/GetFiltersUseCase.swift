@@ -4,13 +4,13 @@ import RxSwift
 // USE CASE to get from service the year list to filter movies
 
 class GetFiltersUseCase {
-	let movieService: MovieServiceType
+	private let movieRepository: MovieRepositoryType
 	
-	init(movieService: MovieServiceType) {
-		self.movieService = movieService
+	init(movieRepository: MovieRepositoryType) {
+		self.movieRepository = movieRepository
 	}
 	
 	func execute() -> Observable<[String]> {
-		return movieService.getFilters()
+		return movieRepository.getFilters()
 	}
 }

@@ -3,48 +3,44 @@ import RxSwift
 
 @testable import MoviesDemo
 
-class CacheclientMovieFake: RealmClient<Movie> {
+class MovieCacheClientFake: RealmClient<Movie> {
 	
 }
 
-class APIClientMovieFake: APIClient<Movie> {
-	
+class MovieAPIClientFake: APIClient {
+    
+    override func execute<R>(_ resource: R) -> Observable<R.ResponseType> where R: ResourceType, R.ResponseType == MovieResultsDto {
+        guard let movieResults: MovieResultsDto = decodeJSONFile(named: "movieResults")
+            else { return Observable<R.ResponseType>.error(APIError.serialization) }
+        return Observable.just(movieResults)
+    }
 }
 
-class APIClientMovieResultsFake: APIClient<MovieResults> {
-
-	override func getItem(forResource resource: ResourceType) -> Observable<MovieResults> {
-		let json = getJSONDictionaryFromFile(named: "movieResults", inBundle: .main)
-		let movieResults = MovieResults(dictionary: json)
-		return Observable.just(movieResults!)
+class MovieApiDataSourceFake: MoviesApiDataSource {
+	
+	init() {
+		super.init(apiClient: MovieAPIClientFake())
 	}
 }
 
-class MoviesApiRepositoryFake: MoviesApiRepository {
-	
+class MovieCacheDataSourceFake: MoviesCacheDataSource<MovieCacheClientFake> {
+
 	init() {
-		super.init(movieApiClient: APIClientMovieFake(), movieResultsApiClient: APIClientMovieResultsFake())
+		super.init(cacheClient: MovieCacheClientFake())
 	}
 }
 
-class MoviesCacheRepositoryFake: MoviesCacheRepository<CacheclientMovieFake> {
-
-	init() {
-		super.init(cacheClient: CacheclientMovieFake())
-	}
-}
-
-class MovieServiceFake: MovieService {
+class MovieRepositoryFake: MovieRepository {
 	
 	init() {
-		super.init(apiRepository: MoviesApiRepositoryFake(),
-				   cacheRepository: MoviesCacheRepositoryFake())
+		super.init(apiDataSource: MovieApiDataSourceFake(),
+				   cacheDataSource: MovieCacheDataSourceFake())
 	}
 }
 
 class GetMoviesUseCaseFake: GetMoviesUseCase {
 	
 	init() {
-		super.init(movieService: MovieServiceFake())
+		super.init(movieRepository: MovieRepositoryFake())
 	}
 }

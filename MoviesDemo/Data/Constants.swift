@@ -27,18 +27,5 @@ struct MoviesCache {
 }
 
 struct MovieKeys {
-	static let id = "id"
-	static let title = "original_title"
-	static let overview = "overview"
-	static let releaseDate = "release_date"
-	static let voteAverage = "vote_average"
-	static let poster = "poster_path"
 	static let year = "year"
-}
-
-struct MovieResultsKeys {
-	static let page = "page"
-	static let totalPages = "total_pages"
-	static let totalResults = "total_results"
-	static let results = "results"
 }

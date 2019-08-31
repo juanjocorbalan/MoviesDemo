@@ -33,42 +33,34 @@ struct SceneAssembler {
 	}
 	
 	func resolve() -> GetMoviesUseCase {
-		return GetMoviesUseCase(movieService: resolve())
+		return GetMoviesUseCase(movieRepository: resolve())
 	}
 	
 	func resolve() -> GetMovieDetailUseCase {
-		return GetMovieDetailUseCase(movieService: resolve())
+		return GetMovieDetailUseCase(movieRepository: resolve())
 	}
 	
 	func resolve() -> GetFiltersUseCase {
-		return GetFiltersUseCase(movieService: resolve())
+		return GetFiltersUseCase(movieRepository: resolve())
 	}
 	
-	func resolve() -> MovieService {
-		return MovieService(apiRepository: resolve(), cacheRepository: resolve())
+	func resolve() -> MovieRepositoryType {
+		return MovieRepository(apiDataSource: resolve(), cacheDataSource: resolve())
 	}
 	
-	func resolve() -> MoviesApiRepository<APIClient<Movie>, APIClient<MovieResults>> {
-		return MoviesApiRepository(movieApiClient: resolve(), movieResultsApiClient: resolve())
+	func resolve() -> MoviesApiDataSourceType {
+		return MoviesApiDataSource(apiClient: resolve())
 	}
 	
-	func resolve() -> MoviesCacheRepository<RealmClient<Movie>> {
-		return MoviesCacheRepository(cacheClient: resolve())
+	func resolve() -> MoviesCacheDataSourceType {
+        return MoviesCacheDataSource<RealmClient<Movie>>(cacheClient: resolve())
 	}
 	
-	func resolve() -> APIClient<Movie> {
-		return APIClient<Movie>()
-	}
-	
-	func resolve() -> APIClient<MovieResults> {
-		return APIClient<MovieResults>()
+	func resolve() -> APIClient {
+		return APIClient()
 	}
 	
 	func resolve() -> RealmClient<Movie> {
 		return RealmClient<Movie>()
-	}
-
-	func resolve() -> CoreDataClient<Movie> {
-		return CoreDataClient<Movie>()
 	}
 }

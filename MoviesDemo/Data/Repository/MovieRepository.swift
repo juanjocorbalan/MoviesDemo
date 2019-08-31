@@ -1,31 +1,25 @@
 import Foundation
 import RxSwift
 
-protocol MovieServiceType {
-	func getTopMovies(by year: String) -> Observable<[Movie]>
-	func getMovieDetail(by id: String) -> Observable<Movie>
-	func getFilters() -> Observable<[String]>
-}
-
-class MovieService: MovieServiceType {
+class MovieRepository: MovieRepositoryType {
 	
-	private let apiRepository: MoviesApiRepositoryType
-	private let cacheRepository: MoviesCacheRepositoryType
+	private let apiDataSource: MoviesApiDataSourceType
+	private let cacheDataSource: MoviesCacheDataSourceType
 	private let disposeBag = DisposeBag()
 	
-	init(apiRepository: MoviesApiRepositoryType, cacheRepository: MoviesCacheRepositoryType) {
-		self.apiRepository = apiRepository
-		self.cacheRepository = cacheRepository
+	init(apiDataSource: MoviesApiDataSourceType, cacheDataSource: MoviesCacheDataSourceType) {
+		self.apiDataSource = apiDataSource
+		self.cacheDataSource = cacheDataSource
 	}
 	
 	func getTopMovies(by year: String) -> Observable<[Movie]> {
 		
-		let apiMoviesObservable = apiRepository.getMovies(by: year)
+		let apiMoviesObservable = apiDataSource.getMovies(by: year)
 			.observeOn(MainScheduler.instance)
 			.flatMap({ [weak self] movies -> Observable<[Movie]> in
 				guard let strongSelf = self else { return Observable.just(movies) }
 				movies.forEach {
-					strongSelf.cacheRepository
+					strongSelf.cacheDataSource
 						.createOrUpdate(movie: $0)
 						.subscribe()
 						.disposed(by: strongSelf.disposeBag)
@@ -33,15 +27,14 @@ class MovieService: MovieServiceType {
 				return Observable.just(movies)
 			})
 		
-		return Observable.merge(cacheRepository.get(where: MovieKeys.year, equals: year), apiMoviesObservable)
+		return Observable.merge(cacheDataSource.get(where: MovieKeys.year, equals: year), apiMoviesObservable)
 			.map { movies in
 				return movies.map { movie in
 					if !movie.posterPath.isEmpty {
 						var movie = movie
 						movie.posterPath = MoviesAPI.baseImagesURL + movie.posterPath
 						return movie
-					}
-					else  {
+					} else  {
 						return movie
 					}
 				}
@@ -49,12 +42,12 @@ class MovieService: MovieServiceType {
 	}
 
 	func getMovieDetail(by id: String) -> Observable<Movie> {
-		return apiRepository.getMovie(by: id)
+		return apiDataSource.getMovie(by: id)
 			.map {
 				var movie = $0
 				movie.posterPath = MoviesAPI.baseImagesURL + movie.posterPath
 				return movie
-		}
+            }
 	}
 
 	func getFilters() -> Observable<[String]> {
