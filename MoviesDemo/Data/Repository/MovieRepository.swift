@@ -51,6 +51,7 @@ class MovieRepository: MovieRepositoryType {
 	}
 
 	func getFilters() -> Observable<[String]> {
-		return Observable.just(["2018", "2017", "2016", "2015", "2014"])
+        let currentYear = Calendar.current.component(.year, from: Date())
+        return Observable.just((2014...currentYear).reversed().map({ String($0) }))
 	}
 }

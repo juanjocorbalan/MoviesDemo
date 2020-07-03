@@ -17,6 +17,6 @@ class MovieDetailCoordinator: Coordinator<Void> {
 				
 		navigationController.pushViewController(viewController, animated: true)
 		
-		return Observable.never()
+        return viewController.rx.deallocated
 	}
 }

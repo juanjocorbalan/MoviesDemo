@@ -13,13 +13,16 @@ class MovieListCoordinator: Coordinator<Void> {
 	// MARK: - Creation
 
 	override func start() -> Observable<Void> {
-		let viewController: MovieListViewController = SceneAssembler().resolve(year: "2018")
+        let currentYear = Calendar.current.component(.year, from: Date())
+		let viewController: MovieListViewController = SceneAssembler().resolve(year: String(currentYear))
 		let navigationController = UINavigationController(rootViewController: viewController)
 		
 		viewController.viewModel.showMovie
-			.subscribe(onNext: { [weak self] in
-				_ = self?.showMovie(by: $0, in: navigationController)
-			})
+            .flatMap { [weak self] movieId -> Observable<Void> in
+                guard let strongSelf = self else { return Observable.empty() }
+                return strongSelf.showMovie(movieId, in: navigationController)
+            }
+			.subscribe()
 			.disposed(by: disposeBag)
 
 		viewController.viewModel.showFilterList
@@ -28,9 +31,8 @@ class MovieListCoordinator: Coordinator<Void> {
 				return strongSelf.showFilterList(on: navigationController)
 			}
 			.filter { $0 != nil }
-			.subscribe(onNext: { year in
-				viewController.viewModel.setFilter.onNext(year!)
-			})
+            .map { $0! }
+            .bind(to: viewController.viewModel.setFilter)
 			.disposed(by: disposeBag)
 		
 		self.window.rootViewController = navigationController
@@ -41,7 +43,8 @@ class MovieListCoordinator: Coordinator<Void> {
 	
 	// MARK: - Navigation
 	
-	private func showMovie(by id: String, in navigationController: UINavigationController) -> Observable<Void>{
+    @discardableResult
+	private func showMovie(_ id: String, in navigationController: UINavigationController) -> Observable<Void>{
 		let coordinator = MovieDetailCoordinator(movieId: id,
 												 navigationController: navigationController)
 		return run(coordinator)
