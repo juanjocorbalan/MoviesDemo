@@ -3,7 +3,7 @@ import RxSwift
 
 struct APIClientConstants {
 	static let retries = 3
-	static let timeout: TimeInterval = 10
+    static let timeout = DispatchTimeInterval.seconds(10)
 }
 
 enum APIError: Error {

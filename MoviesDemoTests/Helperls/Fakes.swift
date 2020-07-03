@@ -9,10 +9,10 @@ class MovieCacheClientFake: RealmClient<Movie> {
 
 class MovieAPIClientFake: APIClient {
     
-    override func execute<R>(_ resource: R) -> Observable<R.ResponseType> where R: ResourceType, R.ResponseType == MovieResultsDto {
+    override func execute<R>(_ resource: R) -> Observable<R.ResponseType> where R : ResourceType {
         guard let movieResults: MovieResultsDto = decodeJSONFile(named: "movieResults")
             else { return Observable<R.ResponseType>.error(APIError.serialization) }
-        return Observable.just(movieResults)
+        return Observable.just(movieResults as! R.ResponseType)
     }
 }
 

@@ -70,7 +70,7 @@ class RealmClient<T: RealmConvertibleEntity>: CacheClientType where T.RealmEntit
 			
 			do {
 				try strongSelf.realm.write {
-					strongSelf.realm.add(element.toRealm(), update: true)
+                    strongSelf.realm.add(element.toRealm(), update: .all)
 				}
 				observer.onNext(())
 				observer.onCompleted()
