@@ -5,16 +5,18 @@ import SafariServices
 class MovieListCoordinator: Coordinator<Void> {
 	
 	private let window: UIWindow
+    private let dependencies: DependencyContainer
 	
-	init(window: UIWindow) {
+    init(window: UIWindow, dependencies: DependencyContainer) {
 		self.window = window
+        self.dependencies = dependencies
 	}
 	
 	// MARK: - Creation
 
 	override func start() -> Observable<Void> {
         let currentYear = Calendar.current.component(.year, from: Date())
-		let viewController: MovieListViewController = SceneAssembler().resolve(year: String(currentYear))
+		let viewController: MovieListViewController = dependencies.resolve(year: String(currentYear))
 		let navigationController = UINavigationController(rootViewController: viewController)
 		
 		viewController.viewModel.showMovie
@@ -43,15 +45,16 @@ class MovieListCoordinator: Coordinator<Void> {
 	
 	// MARK: - Navigation
 	
-    @discardableResult
-	private func showMovie(_ id: String, in navigationController: UINavigationController) -> Observable<Void>{
+ 	private func showMovie(_ id: String, in navigationController: UINavigationController) -> Observable<Void>{
 		let coordinator = MovieDetailCoordinator(movieId: id,
-												 navigationController: navigationController)
+												 navigationController: navigationController,
+                                                 dependencies: dependencies)
 		return run(coordinator)
 	}
 	
 	private func showFilterList(on rootViewController: UIViewController) -> Observable<String?> {
-		let coordinator = FilterListCoordinator(rootViewController: rootViewController)
+		let coordinator = FilterListCoordinator(rootViewController: rootViewController,
+                                                dependencies: dependencies)
 		return run(coordinator)
 	}
 }

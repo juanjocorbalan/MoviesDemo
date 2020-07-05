@@ -4,14 +4,16 @@ import RxSwift
 class FilterListCoordinator: Coordinator<String?> {
 	
 	private let rootViewController: UIViewController
+    private let dependencies: DependencyContainer
 	
-	init(rootViewController: UIViewController) {
+    init(rootViewController: UIViewController, dependencies: DependencyContainer) {
 		self.rootViewController = rootViewController
+        self.dependencies = dependencies
 	}
 	
 	override func start() -> Observable<String?> {
 	
-		let viewController: FilterListViewController = SceneAssembler().resolve()
+		let viewController: FilterListViewController = dependencies.resolve()
 		let navigationController = UINavigationController(rootViewController: viewController)
 		
 		let cancel = viewController.viewModel.didCancel.map { _ in Optional<String>(nilLiteral: ()) }

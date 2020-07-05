@@ -1,6 +1,6 @@
 import Foundation
 
-struct SceneAssembler {
+class DependencyContainer {
 
 	func resolve(year: String) -> MovieListViewController {
 		let viewController = MovieListViewController.initFromStoryboard()
